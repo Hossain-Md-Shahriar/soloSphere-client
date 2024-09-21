@@ -2,8 +2,8 @@ import { useContext, useState } from "react";
 import { useLoaderData } from "react-router-dom";
 import { AuthContext } from "../provider/AuthProvider";
 import axios from "axios";
-import DatePicker from "react-datepicker";
 import { toast } from "react-hot-toast";
+import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -17,15 +17,14 @@ const JobDetails = () => {
     category,
     job_title,
     description,
-    buyer_email,
+    buyer,
     min_price,
     max_price,
   } = job || {};
 
   const handleFormSubmission = async (e) => {
-    if (user?.email === buyer_email) return toast.error("Action not permitted");
-
     e.preventDefault();
+    if (user?.email === buyer?.email) return toast.error("Action not permitted");
     const form = e.target;
     const jobId = _id;
     const price = parseFloat(form.price.value);
@@ -45,7 +44,7 @@ const JobDetails = () => {
       category,
       email,
       status,
-      buyer_email,
+      buyer_email: buyer?.email,
     };
     try {
       const { data } = await axios.post(
@@ -53,9 +52,7 @@ const JobDetails = () => {
         bidData
       );
       console.log(data);
-      if (data.insertedId) {
-        toast.success("Bid Placed Successfully");
-      }
+      toast.success("Bid Placed Successfully");
     } catch (err) {
       console.log(err);
     }
@@ -67,7 +64,7 @@ const JobDetails = () => {
       <div className="flex-1  px-4 py-7 bg-white rounded-md shadow-md md:min-h-[350px]">
         <div className="flex items-center justify-between">
           <span className="text-sm font-light text-gray-800 ">
-            Deadline: {deadline}
+            Deadline: {new Date(deadline).toLocaleDateString()}
           </span>
           <span className="px-4 py-1 text-xs text-blue-800 uppercase bg-blue-200 rounded-full ">
             {category}
@@ -85,13 +82,13 @@ const JobDetails = () => {
           </p>
           <div className="flex items-center gap-5">
             <div>
-              <p className="mt-2 text-sm  text-gray-600 ">Name: Jhankar Vai.</p>
+              <p className="mt-2 text-sm  text-gray-600 ">Name: {buyer?.name}</p>
               <p className="mt-2 text-sm  text-gray-600 ">
-                Email: {buyer_email}
+                Email: {buyer?.email}
               </p>
             </div>
             <div className="rounded-full object-cover overflow-hidden w-14 h-14">
-              <img src="" alt="" />
+              <img src={buyer?.photo} alt="" />
             </div>
           </div>
           <p className="mt-6 text-lg font-bold text-gray-600 ">

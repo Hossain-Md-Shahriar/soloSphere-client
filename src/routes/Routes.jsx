@@ -4,11 +4,14 @@ import Login from "../pages/Authentication/Login";
 import Register from "../pages/Authentication/Register";
 import Home from "../pages/Home";
 import JobDetails from "../pages/JobDetails";
+import AddJob from "../pages/AddJob";
+import ErrorPage from "../pages/ErrorPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Main />,
+    errorElement: <ErrorPage />,
     children: [
       {
         index: true,
@@ -25,7 +28,12 @@ const router = createBrowserRouter([
       {
         path: "/job/:id",
         element: <JobDetails />,
-        loader: ({ params }) => fetch(`${import.meta.env.VITE_API_URL}/job/${params.id}`),
+        loader: ({ params }) =>
+          fetch(`${import.meta.env.VITE_API_URL}/job/${params.id}`),
+      },
+      {
+        path: "/add-job",
+        element: <AddJob />,
       },
     ],
   },
