@@ -4,6 +4,7 @@ import logo from "../../assets/images/logo.png";
 import { useContext, useEffect } from "react";
 import { AuthContext } from "../../provider/AuthProvider";
 import { toast } from "react-hot-toast";
+import axios from "axios";
 
 const Register = () => {
   const navigate = useNavigate();
@@ -35,7 +36,16 @@ const Register = () => {
       const result = await createUser(email, pass);
       console.log(result);
       await updateUserProfile(name, photo);
-      setUser({ ...user, photoURL: photo, displayName: name });
+      // Optimistic update
+      setUser({ ...result?.user, photoURL: photo, displayName: name });
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jwt`,
+        {
+          email: result?.user?.email,
+        },
+        { withCredentials: true }
+      );
+      console.log("token:", data);
       navigate("/");
       toast.success("Signup Successful");
     } catch (err) {
@@ -47,7 +57,15 @@ const Register = () => {
   // Google Signin
   const handleGoogleSignIn = async () => {
     try {
-      await signInWithGoogle();
+      const result = await signInWithGoogle();
+      const { data } = await axios.post(
+        `${import.meta.env.VITE_API_URL}/jwt`,
+        {
+          email: result?.user?.email,
+        },
+        { withCredentials: true }
+      );
+      console.log("token:", data);
       toast.success("Signin Successful");
       navigate("/");
     } catch (err) {
