@@ -1,35 +1,52 @@
-import { useContext, useEffect, useState } from "react";
-import { AuthContext } from "../provider/AuthProvider";
-import axios from "axios";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
+import useAxiosSecure from "../hooks/useAxiosSecure";
+import useAuth from "../hooks/useAuth";
+import { toast } from "react-hot-toast";
 
 const BidRequests = () => {
-  const { user } = useContext(AuthContext);
-  const [bids, setBids] = useState([]);
+  const axiosSecure = useAxiosSecure();
+  const { user } = useAuth();
+  const queryClient = useQueryClient();
 
-  useEffect(() => {
-    getData();
-  }, [user]);
+  const {
+    data: bids = [],
+    isLoading,
+    refetch,
+    isError,
+    error,
+  } = useQuery({
+    queryFn: () => getData(),
+    queryKey: ["bids"],
+  });
 
   const getData = async () => {
-    const { data } = await axios.get(
-      `${import.meta.env.VITE_API_URL}/bid-requests/${user?.email}`,
-      { withCredentials: true }
-    );
-    setBids(data);
+    const { data } = await axiosSecure.get(`/bid-requests/${user?.email}`);
+    return data;
   };
+
+  const { mutateAsync } = useMutation({
+    mutationFn: async ({ id, status }) => {
+      const { data } = await axiosSecure.patch(`/bid/${id}`, { status });
+      console.log(data);
+      return data;
+    },
+    onSuccess: () => {
+      console.log("wow, data updated");
+      toast.success("Updated");
+      // refresh UI for latest data
+      // refetch();
+
+      queryClient.invalidateQueries({ queryKey: ["bids"] }); // this clears cache named bids and refetches it throughout every component
+    },
+  });
 
   //   handle status (In Progress, Rejected)
   const handleStatus = async (id, prevStatus, status) => {
     if (prevStatus === status) return console.log("Sorry vai.. hobena");
-    console.log(id, prevStatus, status);
-    const { data } = await axios.patch(
-      `${import.meta.env.VITE_API_URL}/bid/${id}`,
-      { status }
-    );
-    console.log(data);
-    getData();
+    await mutateAsync({ id, status });
   };
 
+  if (isLoading) return <p>Data is coming...</p>;
   return (
     <section className="container px-4 mx-auto pt-12">
       <div className="flex items-center gap-x-3">
