@@ -1,5 +1,5 @@
 import { useContext, useState } from "react";
-import { useLoaderData } from "react-router-dom";
+import { useLoaderData, useNavigate } from "react-router-dom";
 import { AuthContext } from "../provider/AuthProvider";
 import axios from "axios";
 import { toast } from "react-hot-toast";
@@ -8,6 +8,7 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
 const JobDetails = () => {
+  const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
   const { user } = useContext(AuthContext);
   const job = useLoaderData();
@@ -24,7 +25,8 @@ const JobDetails = () => {
 
   const handleFormSubmission = async (e) => {
     e.preventDefault();
-    if (user?.email === buyer?.email) return toast.error("Action not permitted");
+    if (user?.email === buyer?.email)
+      return toast.error("Action not permitted");
     const form = e.target;
     const jobId = _id;
     const price = parseFloat(form.price.value);
@@ -53,6 +55,7 @@ const JobDetails = () => {
       );
       console.log(data);
       toast.success("Bid Placed Successfully");
+      navigate("/my-bids");
     } catch (err) {
       console.log(err);
     }
@@ -82,7 +85,9 @@ const JobDetails = () => {
           </p>
           <div className="flex items-center gap-5">
             <div>
-              <p className="mt-2 text-sm  text-gray-600 ">Name: {buyer?.name}</p>
+              <p className="mt-2 text-sm  text-gray-600 ">
+                Name: {buyer?.name}
+              </p>
               <p className="mt-2 text-sm  text-gray-600 ">
                 Email: {buyer?.email}
               </p>
