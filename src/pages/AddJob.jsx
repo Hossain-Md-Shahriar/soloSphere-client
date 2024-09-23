@@ -1,14 +1,14 @@
-import { useContext, useState } from "react";
+import { useState } from "react";
 import DatePicker from "react-datepicker";
 
 import "react-datepicker/dist/react-datepicker.css";
-import { AuthContext } from "../provider/AuthProvider";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
 import { toast } from "react-hot-toast";
+import useAuth from "../hooks/useAuth";
 
 const AddJob = () => {
-  const { user } = useContext(AuthContext);
+  const { user } = useAuth();   // custom hook
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
 
