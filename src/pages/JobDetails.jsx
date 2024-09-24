@@ -4,10 +4,12 @@ import { AuthContext } from "../provider/AuthProvider";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 import DatePicker from "react-datepicker";
+import useAxiosSecure from "../hooks/useAxiosSecure";
 
 import "react-datepicker/dist/react-datepicker.css";
 
 const JobDetails = () => {
+  const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
   const { user } = useContext(AuthContext);
@@ -49,8 +51,8 @@ const JobDetails = () => {
       buyer_email: buyer?.email,
     };
     try {
-      const { data } = await axios.post(
-        `${import.meta.env.VITE_API_URL}/bid`,
+      const { data } = await axiosSecure.post(
+        `/bid`,
         bidData
       );
       console.log(data);
@@ -58,6 +60,8 @@ const JobDetails = () => {
       navigate("/my-bids");
     } catch (err) {
       console.log(err);
+      toast.error(err.response.data);
+      e.target.reset();
     }
   };
 
