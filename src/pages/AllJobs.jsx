@@ -7,27 +7,28 @@ const AllJobs = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const [count, setCount] = useState(0);
   const [jobs, setJobs] = useState([]);
+  const [filter, setFilter] = useState("");
   useEffect(() => {
     const getData = async () => {
       const { data } = await axios.get(
         `${
           import.meta.env.VITE_API_URL
-        }/all-jobs?page=${currentPage}&size=${itemsPerPage}`
+        }/all-jobs?page=${currentPage}&size=${itemsPerPage}&filter=${filter}`
       );
       setJobs(data);
     };
     getData();
-  }, [currentPage, itemsPerPage]);
+  }, [currentPage, itemsPerPage, filter]);
 
   useEffect(() => {
     const getCount = async () => {
       const { data } = await axios.get(
-        `${import.meta.env.VITE_API_URL}/jobs-count`
+        `${import.meta.env.VITE_API_URL}/jobs-count?filter=${filter}`
       );
       setCount(data.count);
     };
     getCount();
-  }, []);
+  }, [filter]);
 
   const numberOfPages = Math.ceil(count / itemsPerPage);
   const pages = [...Array(numberOfPages).keys()].map((element) => element + 1);
@@ -45,6 +46,11 @@ const AllJobs = () => {
               name="category"
               id="category"
               className="border p-4 rounded-lg"
+              onChange={(e) => {
+                setFilter(e.target.value);
+                setCurrentPage(1);
+              }}
+              value={filter}
             >
               <option value="">Filter By Category</option>
               <option value="Web Development">Web Development</option>
