@@ -8,7 +8,7 @@ import { toast } from "react-hot-toast";
 import useAuth from "../hooks/useAuth";
 
 const AddJob = () => {
-  const { user } = useAuth();   // custom hook
+  const { user } = useAuth(); // custom hook
   const navigate = useNavigate();
   const [startDate, setStartDate] = useState(new Date());
 
@@ -34,6 +34,7 @@ const AddJob = () => {
         name: user?.displayName,
         photo: user?.photoURL,
       },
+      bid_count: 0,
     };
     try {
       const { data } = await axios.post(
@@ -42,7 +43,7 @@ const AddJob = () => {
       );
       console.log(data);
       toast.success("Job added Successfully");
-      navigate("/my-posted-jobs")
+      navigate("/my-posted-jobs");
     } catch (err) {
       console.log(err);
       toast.error("Error", err.message);
